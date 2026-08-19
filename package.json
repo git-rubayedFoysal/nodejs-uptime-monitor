@@ -1,0 +1,26 @@
+{
+  "name": "raw-node-api-project",
+  "version": "1.0.0",
+  "description": "A RESTFull API to monitor up or down time of user defined links",
+  "license": "ISC",
+  "author": "Rubayed Ahmed Foysal",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "format": "prettier . --write"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^26.2.0",
+    "eslint": "^10.8.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-n": "^18.3.0",
+    "globals": "^17.11.0",
+    "prettier": "^3.9.6"
+  }
+}
