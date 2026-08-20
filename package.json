@@ -5,13 +5,16 @@
   "license": "ISC",
   "author": "Rubayed Ahmed Foysal",
   "type": "module",
+  "engines": {
+    "node": ">=24.0.0"
+  },
   "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "start": "node src/index.js",
-    "dev": "node --watch src/index.js",
+    "start": "NODE_ENV=production node src/index.js",
+    "dev": "NODE_ENV=staging node --watch src/index.js",
     "format": "prettier . --write"
   },
   "devDependencies": {
