@@ -14,54 +14,6 @@ import { env } from "./helpers/environments.js";
 // app object - module scaffolding
 const app = {};
 
-// TODO: remove it latter
-// createData(
-//   "test",
-//   "newFile",
-//   { country: "Bangladesh", language: "Bangla" },
-//   (error) => {
-//     if (error) {
-//       console.error(error.message);
-//       return;
-//     }
-
-//     console.log("Data created successfully!");
-//   },
-// );
-
-// readData("test", "newFile", (error, data) => {
-//   if (error) {
-//     console.error(error.message);
-//     return;
-//   }
-
-//   console.log(data);
-// });
-
-// updateData(
-//   "test",
-//   "newFile",
-//   { country: "India", language: "Hindi" },
-//   (error) => {
-//     if (error) {
-//       console.error(error.message);
-//       return;
-//     }
-
-//     console.log("Data updated successfully!");
-//   },
-// );
-
-// deleteData("test", "newFile", (error) => {
-//   if (error) {
-//     console.log(error.message);
-//     return;
-//   }
-
-//   console.log("Data deleted successfully!");
-// });
-
-// create server
 app.createServer = () => {
   const server = http.createServer(app.handleReqRes);
 

@@ -9,6 +9,7 @@
 import { StringDecoder } from "node:string_decoder";
 import routes from "../routes.js";
 import { notFoundHandler } from "../handler/routesHandlers/notFoundHandler.js";
+import { parseJson } from "./utilities.js";
 
 // module scaffolding
 const handler = {};
@@ -46,7 +47,7 @@ handler.handleReqRes = (req, res) => {
     realData += decoder.end();
 
     chosenRoute(
-      { ...requestProperties, body: realData },
+      { ...requestProperties, body: parseJson(realData) },
       (statusCode, payload) => {
         statusCode = typeof statusCode === "number" ? statusCode : 500;
         payload = typeof payload === "object" ? payload : {};
@@ -54,6 +55,7 @@ handler.handleReqRes = (req, res) => {
         const payloadString = JSON.stringify(payload);
 
         // return the final response
+        res.setHeader("Content-type", "application/json");
         res.writeHead(statusCode);
         res.end(payloadString);
       },

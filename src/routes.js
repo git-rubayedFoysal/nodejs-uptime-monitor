@@ -7,9 +7,11 @@
 
 // Dependencies
 import { sampleHandler } from "./handler/routesHandlers/sampleHandler.js";
+import { userHandler } from "./handler/routesHandlers/userHandler.js";
 
 const routes = {
   sample: sampleHandler,
+  user: userHandler,
 };
 
 export default routes;
