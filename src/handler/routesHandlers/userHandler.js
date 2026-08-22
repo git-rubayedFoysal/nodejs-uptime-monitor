@@ -13,6 +13,7 @@ import {
   deleteData,
 } from "../../lib/data.js";
 import { hash, parseJson } from "../../helpers/utilities.js";
+import { tokenVerify } from "./tokenHandler.js";
 
 // module scaffolding
 const handler = {};
@@ -39,22 +40,36 @@ handler._users.get = (requestProperties, callback) => {
       : false;
 
   if (phone) {
-    readData("users", phone, (err, data) => {
-      if (err) {
-        callback(500, { error: "Requested user not found!" });
+    const token =
+      typeof requestProperties.headersObj?.token === "string"
+        ? requestProperties.headersObj.token
+        : false;
+
+    if (!token) {
+      callback(400, { error: "Invalid request!" });
+      return;
+    }
+
+    tokenVerify(token, phone, (isUser) => {
+      if (!isUser) {
+        callback(403, { error: "Authentication failure!" });
         return;
       }
+      readData("users", phone, (err, data) => {
+        if (err) {
+          callback(500, { error: "Requested user not found!" });
+          return;
+        }
 
-      const user = { ...parseJson(data) };
-      delete user.password;
-      callback(200, user);
+        const user = { ...parseJson(data) };
+        delete user.password;
+        callback(200, user);
+      });
     });
   } else {
     callback(404, { error: "Requested user not found!" });
   }
 };
-
-// TODO: Check authentication before each request
 
 // handle post request in user route
 handler._users.post = (requestProperties, callback) => {
@@ -150,25 +165,43 @@ handler._users.put = (requestProperties, callback) => {
   }
 
   if (firstName || lastName || password) {
-    readData("users", phone, (err, data) => {
-      if (err) {
-        callback(500, { error: "Could not update the user." });
+    const token =
+      typeof requestProperties.headersObj?.token === "string" &&
+      requestProperties.headersObj?.token.trim().length === 32
+        ? requestProperties.headersObj.token
+        : false;
+
+    if (!token) {
+      callback(400, { error: "Invalid request!" });
+      return;
+    }
+
+    tokenVerify(token, phone, (isUser) => {
+      if (!isUser) {
+        callback(403, { error: "Authentication failure!" });
         return;
       }
 
-      const userData = { ...parseJson(data) };
-
-      if (firstName) userData.firstName = firstName;
-      if (lastName) userData.lastName = lastName;
-      if (password) userData.password = hash(password);
-
-      updateData("users", phone, userData, (error) => {
-        if (error) {
+      readData("users", phone, (err, data) => {
+        if (err) {
           callback(500, { error: "Could not update the user." });
           return;
         }
 
-        callback(200, { message: "User was updated successfully!" });
+        const userData = { ...parseJson(data) };
+
+        if (firstName) userData.firstName = firstName;
+        if (lastName) userData.lastName = lastName;
+        if (password) userData.password = hash(password);
+
+        updateData("users", phone, userData, (error) => {
+          if (error) {
+            callback(500, { error: "Could not update the user." });
+            return;
+          }
+
+          callback(200, { message: "User was updated successfully!" });
+        });
       });
     });
   }
@@ -176,9 +209,9 @@ handler._users.put = (requestProperties, callback) => {
 // handle delete request in user route
 handler._users.delete = (requestProperties, callback) => {
   const phone =
-    typeof requestProperties.queryObj.phone === "string" &&
-    requestProperties.queryObj.phone.trim().length === 11
-      ? requestProperties.queryObj.phone
+    typeof requestProperties.queryObj?.phone === "string" &&
+    requestProperties.queryObj?.phone.trim().length === 11
+      ? requestProperties.queryObj?.phone
       : false;
 
   if (!phone) {
@@ -186,13 +219,38 @@ handler._users.delete = (requestProperties, callback) => {
     return;
   }
 
-  deleteData("users", phone, (err) => {
-    if (err) {
-      callback(500, { error: "Could not delete requested user!" });
+  const token =
+    typeof requestProperties.headersObj?.token === "string" &&
+    requestProperties.headersObj?.token.trim().length === 32
+      ? requestProperties.headersObj.token
+      : false;
+
+  if (!token) {
+    callback(400, { error: "Invalid request!" });
+    return;
+  }
+
+  tokenVerify(token, phone, (isUser) => {
+    if (!isUser) {
+      callback(403, { error: "Authentication failure!" });
       return;
     }
 
-    callback(200, { message: "User was deleted successfully!" });
+    readData("users", phone, (err) => {
+      if (err) {
+        callback(404, { error: "Requested user was not found!" });
+        return;
+      }
+
+      deleteData("users", phone, (err) => {
+        if (err) {
+          callback(500, { error: "Could not delete requested user!" });
+          return;
+        }
+
+        callback(200, { message: "User was deleted successfully!" });
+      });
+    });
   });
 };
 

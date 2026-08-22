@@ -6,7 +6,7 @@
  */
 
 // dependencies
-import { createHmac } from "node:crypto";
+import { createHmac, randomBytes } from "node:crypto";
 import { env } from "./environments.js";
 
 // module - scaffolding
@@ -32,4 +32,10 @@ utilities.hash = (str) => {
   }
 };
 
-export const { parseJson, hash } = utilities;
+utilities.generateToken = () => {
+  const token = randomBytes(16).toString("hex");
+
+  return token;
+};
+
+export const { parseJson, hash, generateToken } = utilities;
