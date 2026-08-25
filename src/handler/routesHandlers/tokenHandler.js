@@ -91,7 +91,7 @@ handler._token.post = (requestProperties, callback) => {
       return;
     }
 
-    // generate a new token id and set expiry to 1 hour from now
+    // generate a new token id and set expiry to 6 hours from now
     let tokenId = generateToken();
     let expire = Date.now() + 60 * 60 * 1000 * 6;
 
@@ -112,7 +112,7 @@ handler._token.post = (requestProperties, callback) => {
     });
   });
 };
-// handle put request in token route - extend token expiry by 1 hour
+// handle put request in token route - extend token expiry by 6 hours
 handler._token.put = (requestProperties, callback) => {
   // validate token id from request body (must be 32 char hex string)
   const id =
@@ -148,7 +148,7 @@ handler._token.put = (requestProperties, callback) => {
       return;
     }
 
-    // extend expiry by 1 hour and persist
+    // extend expiry by 6 hours and persist
     tokenData.expire = Date.now() + 60 * 60 * 1000 * 6;
     updateData("tokens", id, tokenData, (err) => {
       if (err) {

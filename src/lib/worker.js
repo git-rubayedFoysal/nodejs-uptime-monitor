@@ -178,11 +178,11 @@ worker.alertUser = (newCheckData) => {
   });
 };
 
-// run the check loop continuously - gathers and performs checks every 8 seconds
+// run the check loop continuously - gathers and performs checks every 1 minute
 worker.loop = () => {
   setInterval(() => {
     worker.getherChecks();
-  }, 8000);
+  }, 1000 * 60);
 };
 
 // initialize the worker - gather all checks once, then start the loop
