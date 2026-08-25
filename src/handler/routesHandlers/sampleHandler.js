@@ -8,6 +8,7 @@
 // module scaffolding
 const handler = {};
 
+// sample route handler - responds with a simple message for testing
 handler.sampleHandler = (requestProperties, callback) => {
   console.log(requestProperties);
 

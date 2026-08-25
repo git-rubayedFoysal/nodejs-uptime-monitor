@@ -6,24 +6,20 @@
  */
 
 // dependencies
-import http from "node:http";
-import { handleReqRes } from "./helpers/handleReqRes.js";
-import { env } from "./helpers/environments.js";
-// import { deleteData } from "./lib/data.js";
+import server from "./server.js";
+import worker from "./lib/worker.js";
 
 // app object - module scaffolding
 const app = {};
 
-app.createServer = () => {
-  const server = http.createServer(app.handleReqRes);
+app.init = () => {
+  // start the server
+  server.init();
 
-  server.listen(env.port, () => {
-    console.log(`Server Started at http://localhost:${env.port}`);
-  });
+  // start the worker
+  worker.init();
 };
 
-// handle Request Response
-app.handleReqRes = handleReqRes;
+app.init();
 
-// start server
-app.createServer();
+export default app;

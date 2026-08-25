@@ -12,12 +12,20 @@ environments.staging = {
   port: 3000,
   envName: "staging",
   secreteKey: "stagingKey",
+  maxCheck: 5,
+  smsBd: {
+    apiKey: process.env.SMS_BD_API_KEY,
+  },
 };
 
 environments.production = {
   port: 5000,
   envName: "production",
   secreteKey: "productionKey",
+  maxCheck: 5,
+  smsBd: {
+    apiKey: process.env.SMS_BD_API_KEY,
+  },
 };
 
 // determine which environments passed

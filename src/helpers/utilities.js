@@ -38,4 +38,8 @@ utilities.generateToken = () => {
   return token;
 };
 
-export const { parseJson, hash, generateToken } = utilities;
+utilities.generateID = () => {
+  return randomBytes(8).toString("hex");
+};
+
+export const { parseJson, hash, generateToken, generateID } = utilities;

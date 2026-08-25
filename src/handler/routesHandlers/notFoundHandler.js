@@ -8,10 +8,11 @@
 // module scaffolding
 const handler = {};
 
+// fallback handler - responds with 404 for any unmatched route
 handler.notFoundHandler = (requestProperties, callback) => {
   console.log(requestProperties);
   callback(404, {
-    massage: "Your requested URL not found!",
+    message: "Your requested URL not found!",
   });
 };
 

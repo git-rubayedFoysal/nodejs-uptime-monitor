@@ -13,8 +13,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "start": "NODE_ENV=production node src/index.js",
-    "dev": "NODE_ENV=staging node --watch src/index.js",
+    "start": "NODE_ENV=production node --env-file=.env src/index.js",
+    "dev": "NODE_ENV=staging node --env-file=.env --watch src/index.js",
     "format": "prettier . --write"
   },
   "devDependencies": {

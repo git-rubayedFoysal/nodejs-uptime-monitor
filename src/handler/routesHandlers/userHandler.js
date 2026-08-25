@@ -18,6 +18,7 @@ import { tokenVerify } from "./tokenHandler.js";
 // module scaffolding
 const handler = {};
 
+// main user handler - routes request to the matching method handler
 handler.userHandler = (requestProperties, callback) => {
   const allowedMethod = ["get", "post", "put", "delete"];
 
@@ -31,8 +32,9 @@ handler.userHandler = (requestProperties, callback) => {
 // scaffolding for each method function
 handler._users = {};
 
-// handle get request in user route
+// handle get request in user route - retrieve user profile (requires valid token)
 handler._users.get = (requestProperties, callback) => {
+  // validate phone number from query string (must be 11 char string)
   const phone =
     typeof requestProperties.queryObj?.phone === "string" &&
     requestProperties.queryObj?.phone.trim().length === 11
@@ -40,6 +42,7 @@ handler._users.get = (requestProperties, callback) => {
       : false;
 
   if (phone) {
+    // extract token from request headers
     const token =
       typeof requestProperties.headersObj?.token === "string"
         ? requestProperties.headersObj.token
@@ -50,6 +53,7 @@ handler._users.get = (requestProperties, callback) => {
       return;
     }
 
+    // verify token belongs to the requested phone before returning data
     tokenVerify(token, phone, (isUser) => {
       if (!isUser) {
         callback(403, { error: "Authentication failure!" });
@@ -57,46 +61,52 @@ handler._users.get = (requestProperties, callback) => {
       }
       readData("users", phone, (err, data) => {
         if (err) {
-          callback(500, { error: "Requested user not found!" });
+          callback(404, { error: "Requested user not found!" });
           return;
         }
 
         const user = { ...parseJson(data) };
+        // never expose password in response
         delete user.password;
         callback(200, user);
       });
     });
   } else {
-    callback(404, { error: "Requested user not found!" });
+    callback(400, { error: "Invalid request!" });
   }
 };
 
-// handle post request in user route
+// handle post request in user route - register a new user
 handler._users.post = (requestProperties, callback) => {
+  // validate first name (must be non-empty string)
   const firstName =
     typeof requestProperties.body.firstName === "string" &&
     requestProperties.body.firstName.trim().length > 0
       ? requestProperties.body.firstName
       : false;
 
+  // validate last name (must be non-empty string)
   const lastName =
     typeof requestProperties.body.lastName === "string" &&
     requestProperties.body.lastName.trim().length > 0
       ? requestProperties.body.lastName
       : false;
 
+  // validate phone number (must be 11 char string)
   const phone =
     typeof requestProperties.body.phone === "string" &&
     requestProperties.body.phone.trim().length === 11
       ? requestProperties.body.phone
       : false;
 
+  // validate password (must be non-empty string)
   const password =
     typeof requestProperties.body.password === "string" &&
     requestProperties.body.password.trim().length > 0
       ? requestProperties.body.password
       : false;
 
+  // validate terms of service agreement (must be boolean true)
   const tosAgreement =
     typeof requestProperties.body.tosAgreement === "boolean" &&
     requestProperties.body.tosAgreement === true
@@ -104,8 +114,10 @@ handler._users.post = (requestProperties, callback) => {
       : false;
 
   if (firstName && lastName && phone && password && tosAgreement) {
+    // check if user already exists before creating
     readData("users", phone, (error) => {
       if (error) {
+        // user doesn't exist - create new user with hashed password
         const userData = {
           firstName,
           lastName,
@@ -128,31 +140,35 @@ handler._users.post = (requestProperties, callback) => {
       }
     });
   } else {
-    callback(404, {
+    callback(400, {
       error: "You have a problem in your request.",
     });
   }
 };
-// handle put request in user route
+// handle put request in user route - update user profile (requires valid token)
 handler._users.put = (requestProperties, callback) => {
+  // validate first name (optional - only update if provided)
   const firstName =
     typeof requestProperties.body.firstName === "string" &&
     requestProperties.body.firstName.trim().length > 0
       ? requestProperties.body.firstName
       : false;
 
+  // validate last name (optional - only update if provided)
   const lastName =
     typeof requestProperties.body.lastName === "string" &&
     requestProperties.body.lastName.trim().length > 0
       ? requestProperties.body.lastName
       : false;
 
+  // validate phone number (required - identifies the user to update)
   const phone =
     typeof requestProperties.body.phone === "string" &&
     requestProperties.body.phone.trim().length === 11
       ? requestProperties.body.phone
       : false;
 
+  // validate password (optional - only update if provided)
   const password =
     typeof requestProperties.body.password === "string" &&
     requestProperties.body.password.trim().length > 0
@@ -164,7 +180,9 @@ handler._users.put = (requestProperties, callback) => {
     return;
   }
 
+  // at least one field must be provided to update
   if (firstName || lastName || password) {
+    // extract token from request headers
     const token =
       typeof requestProperties.headersObj?.token === "string" &&
       requestProperties.headersObj?.token.trim().length === 32
@@ -176,6 +194,7 @@ handler._users.put = (requestProperties, callback) => {
       return;
     }
 
+    // verify token belongs to the requested phone before updating
     tokenVerify(token, phone, (isUser) => {
       if (!isUser) {
         callback(403, { error: "Authentication failure!" });
@@ -190,6 +209,7 @@ handler._users.put = (requestProperties, callback) => {
 
         const userData = { ...parseJson(data) };
 
+        // update only the fields that were provided
         if (firstName) userData.firstName = firstName;
         if (lastName) userData.lastName = lastName;
         if (password) userData.password = hash(password);
@@ -204,10 +224,13 @@ handler._users.put = (requestProperties, callback) => {
         });
       });
     });
+  } else {
+    callback(400, { error: "At least one field must be provided to update" });
   }
 };
-// handle delete request in user route
+// handle delete request in user route - delete user account (requires valid token)
 handler._users.delete = (requestProperties, callback) => {
+  // validate phone number from query string (must be 11 char string)
   const phone =
     typeof requestProperties.queryObj?.phone === "string" &&
     requestProperties.queryObj?.phone.trim().length === 11
@@ -219,6 +242,7 @@ handler._users.delete = (requestProperties, callback) => {
     return;
   }
 
+  // extract token from request headers
   const token =
     typeof requestProperties.headersObj?.token === "string" &&
     requestProperties.headersObj?.token.trim().length === 32
@@ -230,18 +254,21 @@ handler._users.delete = (requestProperties, callback) => {
     return;
   }
 
+  // verify token belongs to the requested phone before deleting
   tokenVerify(token, phone, (isUser) => {
     if (!isUser) {
       callback(403, { error: "Authentication failure!" });
       return;
     }
 
+    // verify user exists before deleting
     readData("users", phone, (err) => {
       if (err) {
         callback(404, { error: "Requested user was not found!" });
         return;
       }
 
+      // delete the user from storage
       deleteData("users", phone, (err) => {
         if (err) {
           callback(500, { error: "Could not delete requested user!" });

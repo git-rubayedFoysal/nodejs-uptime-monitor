@@ -95,9 +95,25 @@ lib.delete = async (dir, file, callback) => {
   }
 };
 
+// list all checks
+lib.list = async (dir, callback) => {
+  try {
+    const allChecks = await fs.readdir(path.join(lib.basePath, dir));
+    let trimmedFileName = [];
+    allChecks.forEach((check) => {
+      trimmedFileName.push(check.replace(".json", ""));
+    });
+
+    callback(null, trimmedFileName);
+  } catch (error) {
+    callback(error, null);
+  }
+};
+
 export const {
   create: createData,
   read: readData,
   update: updateData,
   delete: deleteData,
+  list: listData,
 } = lib;
