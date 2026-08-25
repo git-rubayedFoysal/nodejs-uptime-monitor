@@ -183,8 +183,8 @@ Set these in a `.env` file (for local dev) or in your hosting platform dashboard
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/<your-username>/raw-node-api-project.git
-cd raw-node-api-project
+git clone https://github.com/git-rubayedFoysal/nodejs-uptime-monitor.git
+cd nodejs-uptime-monitor
 
 # 2. Install dependencies
 npm install
@@ -373,3 +373,6 @@ ISC
 ## Author
 
 **Rubayed Ahmed Foysal**
+
+- GitHub: [@git-rubayedFoysal](https://github.com/git-rubayedFoysal)
+- Repository: [nodejs-uptime-monitor](https://github.com/git-rubayedFoysal/nodejs-uptime-monitor)
